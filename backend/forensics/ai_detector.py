@@ -6,7 +6,7 @@ print("Loading AI image detector...")
 
 detector = pipeline(
     "image-classification",
-    model="capcheck/ai-human-generated-image-detection"
+    model="Ateeqq/ai-vs-human-image-detector"
 )
 
 print("AI image detector loaded.")

@@ -3,10 +3,15 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.forensics.image_analyzer import analyze_image
+from backend.forensics.forensic_assessor import assess_forensics
+from backend.forensics.manipulation_detector import detect_manipulation
+from fastapi.staticfiles import StaticFiles
 import os
 
 
 app = FastAPI()
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 app.add_middleware(
@@ -57,33 +62,24 @@ async def upload_file(file: UploadFile = File(...)):
 
             if "ai" in label:
                 ai_score = score
-            elif "human" in label:
+            elif "human" in label or label == "hum":
                 human_score = score
         ai_detection = {
             "ai_probability": ai_score,
             "human_probability": human_score
         }
-        # Determine overall assessment
-        if ai_score >= 0.70:
-            assessment = "Likely AI-generated"
-            confidence = "High"
-        elif ai_score >= 0.40:
-            assessment = "Uncertain"
-            confidence = "Moderate"
-        else:
-            assessment = "Likely human-created"
-            confidence = "High"
+        # Perform image manipulation checks (Error Level Analysis)
+        manipulation_detection = detect_manipulation(file_path)
 
-        forensic_assessment = {
-            "assessment": assessment,
-            "confidence": confidence
-        }
+        # Determine overall assessment using multi-signal Forensic Assessor
+        forensic_assessment = assess_forensics(analysis, ai_detection, manipulation_detection)
         
 
         return {
             "message": "Forensic analysis completed.",
             "analysis": analysis,
             "ai_detection": ai_detection,
+            "manipulation_detection": manipulation_detection,
             "forensic_assessment": forensic_assessment
         }
 
