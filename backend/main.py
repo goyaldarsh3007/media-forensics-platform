@@ -63,12 +63,28 @@ async def upload_file(file: UploadFile = File(...)):
             "ai_probability": ai_score,
             "human_probability": human_score
         }
+        # Determine overall assessment
+        if ai_score >= 0.70:
+            assessment = "Likely AI-generated"
+            confidence = "High"
+        elif ai_score >= 0.40:
+            assessment = "Uncertain"
+            confidence = "Moderate"
+        else:
+            assessment = "Likely human-created"
+            confidence = "High"
+
+        forensic_assessment = {
+            "assessment": assessment,
+            "confidence": confidence
+        }
         
 
         return {
             "message": "Forensic analysis completed.",
             "analysis": analysis,
-            "ai_detection": ai_detection
+            "ai_detection": ai_detection,
+            "forensic_assessment": forensic_assessment
         }
 
     except Exception as error:

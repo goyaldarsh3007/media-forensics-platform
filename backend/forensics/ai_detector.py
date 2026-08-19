@@ -21,4 +21,7 @@ def detect_ai_image(image_path):
 
     results = detector(image)
 
+    print("\nRAW AI DETECTOR RESULT:")
+    print(results)
+
     return results
