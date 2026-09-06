@@ -1,3 +1,0 @@
-$env:Path -split ';' | Select-String "nodejs"
-
-$env:Path
