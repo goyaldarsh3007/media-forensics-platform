@@ -1,7 +1,87 @@
 import { useState } from "react";
 import "./App.css";
 
+function Login({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!email.trim() || !password) {
+      setError("Enter your email and password to continue.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Your password must contain at least 8 characters.");
+      return;
+    }
+
+    sessionStorage.setItem("media-forensics-authenticated", "true");
+    onLogin();
+  };
+
+  return (
+    <main className="login-page">
+      <section className="login-panel">
+        <div className="login-panel-inner">
+          <div className="login-brand">Pixel Forensics</div>
+          <div className="login-heading">
+            <p className="eyebrow">MEDIA FORENSICS PLATFORM</p>
+            <h2>Welcome back</h2>
+            <p>Sign in to access your investigation command center.</p>
+          </div>
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <label htmlFor="login-email">Username</label>
+            <input
+              id="login-email"
+              type="text"
+              autoComplete="username"
+              placeholder="Enter your username"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+
+            <div className="password-label-row">
+              <label htmlFor="login-password">Password</label>
+            </div>
+            <input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+
+            {error && <p className="login-error" role="alert">{error}</p>}
+
+            <button type="submit" className="login-submit">
+              Sign in to dashboard
+            </button>
+          </form>
+
+          <div className="demo-access">
+            <span>Demo access:</span> <strong>analyst</strong> / <strong>forensics123</strong>
+          </div>
+
+          <p className="login-footer">
+            Session access is cleared when you sign out or close this browser tab.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function App() {
+
+  const [authenticated, setAuthenticated] = useState(
+    () => sessionStorage.getItem("media-forensics-authenticated") === "true"
+  );
 
   const [file, setFile] = useState(null);
   const [analysis, setAnalysis] = useState(null);
@@ -126,6 +206,9 @@ function App() {
 
   };
 
+  if (!authenticated) {
+    return <Login onLogin={() => setAuthenticated(true)} />;
+  }
 
   return (
 
